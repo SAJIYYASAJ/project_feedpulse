@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>FeedPulse Dashboard</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f7fb;
+      margin: 0;
+      padding: 30px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .topbar {
+      max-width: 900px;
+      margin: 0 auto 20px auto;
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    select, input {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      display: grid;
+      gap: 15px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #222;
+      margin-bottom: 8px;
+    }
+
+    .meta {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .desc {
+      color: #444;
+      margin-bottom: 12px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: white;
+      background: #667eea;
+      margin-right: 8px;
+    }
+
+    .empty {
+      text-align: center;
+      color: gray;
+      padding: 30px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Admin Dashboard</h2>
+
+  <div class="topbar">
+    <input id="search" placeholder="Search title..." oninput="renderFeedbacks()">
+    <select id="filterCategory" onchange="renderFeedbacks()">
+      <option value="">All Categories</option>
+      <option>Bug</option>
+      <option>Feature Request</option>
+      <option>Improvement</option>
+      <option>Other</option>
+    </select>
+  </div>
+
+  <div id="feedbackList" class="container"></div>
+
+  <script>
+     let allFeedbacks = [];
+
+  async function loadFeedbacks() {
+    try {
+      const res = await fetch("http://localhost:4000/api/feedback");
+      const result = await res.json();
+
+      console.log("API result:", result);
+
+      allFeedbacks = result.data || [];
+
+      renderFeedbacks();
+    } catch (error) {
+      console.error("Load error:", error);
+      document.getElementById("feedbackList").innerHTML =
+        <div class="empty">Error loading feedback</div>;
+    }
+  }
+
+  function renderFeedbacks() {
+    const list = document.getElementById("feedbackList");
+    const searchValue = document.getElementById("search").value.toLowerCase();
+    const filterCategory = document.getElementById("filterCategory").value;
+
+    const filtered = allFeedbacks.filter(item => {
+      const title = (item.title || "").toLowerCase();
+      const category = item.category || "";
+
+      const matchSearch = title.includes(searchValue);
+      const matchCategory = filterCategory ? category === filterCategory : true;
+
+      return matchSearch && matchCategory;
+    });
+
+    if (filtered.length === 0) {
+      list.innerHTML = <div class="empty">No feedback found</div>;
+      return;
+    }
+
+    list.innerHTML = "";
+
+    filtered.forEach(item => {
+      const card = document.createElement("div");
+      card.className = "card";
+
+      card.innerHTML = `
+        <div class="title">${item.title || ""}</div>
+        <div class="meta">ID: ${item.id || ""}</div>
+        <div class="desc">${item.description || ""}</div>
+        <span class="badge">${item.category || ""}</span>
+      `;
+
+      list.appendChild(card);
+    });
+  }
+
+  document.getElementById("search").addEventListener("input", renderFeedbacks);
+  document.getElementById("filterCategory").addEventListener("change", renderFeedbacks);
+
+  loadFeedbacks();
+  </script>
+
+</body>
+</html>

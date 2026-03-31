@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>FeedPulse</title>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      width: 400px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      animation: fadeIn 0.6s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 5px rgba(102,126,234,0.5);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #5a67d8;
+    }
+
+    #count {
+      font-size: 12px;
+      color: gray;
+      margin-top: -10px;
+      margin-bottom: 15px;
+      text-align: right;
+    }
+
+    .success {
+      color: green;
+      text-align: center;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h2>Submit Feedback</h2>
+
+    <input id="title" placeholder="Enter title">
+
+    <textarea id="description" placeholder="Enter description" oninput="updateCount()"></textarea>
+    <div id="count">0 characters</div>
+
+    <select id="category">
+      <option>Bug</option>
+      <option>Feature Request</option>
+      <option>Improvement</option>
+      <option>Other</option>
+    </select>
+
+    <button onclick="submitFeedback()">Submit</button>
+
+    <div id="msg" class="success"></div>
+  </div>
+
+<script>
+function updateCount() {
+  const description = document.getElementById("description").value;
+  document.getElementById("count").innerText = description.length + " characters";
+}
+
+async function submitFeedback() {
+  const title = document.getElementById("title").value.trim();
+  const description = document.getElementById("description").value.trim();
+  const category = document.getElementById("category").value;
+
+  if (!title) {
+    alert("Title required");
+    return;
+  }
+
+  if (description.length < 10) {
+    alert("Description too short");
+    return;
+  }
+
+  const res = await fetch("http://localhost:4000/api/feedback", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ title, description, category })
+  });
+
+  const data = await res.json();
+
+  document.getElementById("msg").innerText = "✅ Feedback submitted successfully!";
+}
+</script>
+
+</body>
+</html>
