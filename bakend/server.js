@@ -1,17 +1,17 @@
-// 1️⃣ Imports
+// Imports
 const express = require("express");
 const cors = require("cors");
 
 const app = express();
 
-// 2️⃣ Middleware
+//  Middleware
 app.use(cors());
 app.use(express.json());
 
-// 3️⃣ Temporary data store
+//  Temporary data store
 let feedbacks = [];
 
-// 4️⃣ POST (create feedback)
+//  POST (create feedback)
 app.post("/api/feedback", (req, res) => {
   const { title, description, category } = req.body;
 
@@ -36,12 +36,12 @@ app.post("/api/feedback", (req, res) => {
   res.json({ success: true, data: newFeedback });
 });
 
-// 5️⃣ GET all feedbacks
+//  GET all feedbacks
 app.get("/api/feedback", (req, res) => {
   res.json({ success: true, data: feedbacks });
 });
 
-// 6️⃣ GET single feedback
+//  GET single feedback
 app.get("/api/feedback/:id", (req, res) => {
   const item = feedbacks.find(f => f.id == req.params.id);
 
@@ -52,7 +52,7 @@ app.get("/api/feedback/:id", (req, res) => {
   res.json({ success: true, data: item });
 });
 
-// 7️⃣ PATCH (update status)
+//  PATCH (update status)
 app.patch("/api/feedback/:id", (req, res) => {
   const item = feedbacks.find(f => f.id == req.params.id);
 
@@ -65,7 +65,7 @@ app.patch("/api/feedback/:id", (req, res) => {
   res.json({ success: true, data: item });
 });
 
-// 8️⃣ Server start (LAST)
+//  Server start (LAST)
 app.listen(4000, () => {
   console.log("Server running on http://localhost:4000");
 });
